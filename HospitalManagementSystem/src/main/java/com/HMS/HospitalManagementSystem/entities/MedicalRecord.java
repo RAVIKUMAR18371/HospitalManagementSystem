@@ -1,0 +1,95 @@
+package com.HMS.HospitalManagementSystem.entities;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
+
+@Entity
+@Table(name="medical_records")
+public class MedicalRecord {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer documentId;
+
+    private Integer patientId;
+    private Integer doctorId;
+    private String department;
+    private String description; // e.g., "general-checkup"
+
+    // Stores the AES-128 encrypted prescription
+    @Column(columnDefinition = "TEXT")
+    private String encryptedPrescription;
+
+
+    // Stores the SHA-256 hash for blockchain-like data integrity
+    private String dataHash;
+
+    //The specific key required by the patient/staff to decrypt the file later
+    private String fileKey;
+
+    public Integer getDocumentId(){
+        return documentId;
+    }
+
+    public void setEncryptedDescription(String encryptedPrescription){
+        this.encryptedPrescription = encryptedPrescription;
+    }
+
+    public String getEncryptedPrescription(){
+        return encryptedPrescription;
+    }
+
+    public void setPatientId(Integer PatientId){
+        this.patientId = PatientId;
+    }
+
+    public Integer getPatientId(){
+        return patientId;
+    }
+
+     public void setDoctorId(Integer DoctorId){
+        this.doctorId = DoctorId;
+    }
+
+    public Integer getDoctorId(){
+        return doctorId;
+    }
+
+      public void setDepartment(String department){
+        this.department = department;
+    }
+
+    public String getDepartment(){
+        return department;
+    }
+    
+    
+      public void setDescription(String description){
+        this.description = description;
+    }
+
+    public String getDescription(){
+        return description;
+    }
+
+    public void setDataHash(String dataHash){
+        this.dataHash = dataHash;
+    }
+
+    public String getDataHash(){
+        return dataHash;
+    }
+
+    public void setFileKey(String fileKey){
+        this.fileKey = fileKey;
+    }
+
+    public String getFileKey(){
+        return fileKey;
+    }
+    
+}
