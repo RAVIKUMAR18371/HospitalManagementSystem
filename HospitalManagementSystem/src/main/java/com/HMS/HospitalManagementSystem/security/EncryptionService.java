@@ -8,6 +8,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.stereotype.Service;
 
+import com.HMS.HospitalManagementSystem.entities.Patient;
+
 import lombok.Value;
 
 @Service
@@ -15,11 +17,11 @@ public class EncryptionService {
     private static final String AES_KEY = "YourKey16Secrets";
 
     //Encrypt prescriptions and patient details using AES-128
-    public String encryptAES128(String data) throws Exception{
+    public String encryptAES128(Patient patient) throws Exception{
         SecretKeySpec secretKey = new SecretKeySpec(AES_KEY.getBytes(), "AES");
         Cipher cipher = Cipher.getInstance("AES"); // Cipher is used for encryption and decryption
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
+        byte[] encryptedBytes = cipher.doFinal(patient.getBytes());
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
