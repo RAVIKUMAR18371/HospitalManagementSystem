@@ -1,6 +1,5 @@
 package com.HMS.HospitalManagementSystem.controllers;
-
-import com.HMS.HospitalManagementSystem.security.EncryptionService;
+import java.util.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,25 +8,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.HMS.HospitalManagementSystem.entities.MedicalRecord;
+import com.HMS.HospitalManagementSystem.repositories.MedicalRecordRepository;
+import com.HMS.HospitalManagementSystem.security.EncryptionService;
+
 @RestController
 @RequestMapping("/api/patient-dashboard")
 public class PatientDashboardController {
 
+    private final MedicalRecordRepository recordRepository;
     private final EncryptionService encryptionService;
 
-    public PatientDashboardController(EncryptionService encryptionService) {
+    // Injectting the repository via constructor
+    public PatientDashboardController(MedicalRecordRepository recordRepository, EncryptionService encryptionService){
+        this.recordRepository = recordRepository;
         this.encryptionService = encryptionService;
     }
 
     // Step 1: Display the Approved List of Documents
     @GetMapping("/{patientId}/approved-list")
     @PreAuthorize("hasRole('USER')") // Only accessible by patients
-    public String getApprovedList(@PathVariable Integer patientId) {
+    public List<MedicalRecord> getApprovedList(@PathVariable Integer patientId) {
         // In a real application, you would query the database:
         // List<MedicalRecord> records = medicalRecordRepository.findByPatientId(patientId);
-        
         // The table must return data such as Patient ID, Doctor ID, Department, Description, File Key, and an Action button [1].
-        return "Retrieving Approved List for Patient: " + patientId;
+        return recordRepository.findByPatientId(patientId);
     }
 
     // Step 2: Verify the File Key and Decrypt the Document
