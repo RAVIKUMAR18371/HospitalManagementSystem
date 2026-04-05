@@ -21,12 +21,13 @@ public class RegistrationController {
     }
 
     // Step1: Open to the public for creating an account requests
+    @PostMapping("/patient")
     public String registerPatient(@RequestBody Patient patient) throws Exception{
         // Encrypting the Sensitive Data before saving
-        patient.setSecretId(encryptionService.encryptAES128(patient)); // It is needed for the document verification and it is used for that.
+        patient.setSecretId(encryptionService.encryptAES128(patient.getSecretId())); // It is needed for the document verification and it is used for that.
         // Hashing the record to prevent tempering and now 
 
-        // Save to database with status "PENDING"
+        // Save to database with
        // patientRepository.save(patient);
 
         return "Registration request submitted to admin for approval.";

@@ -8,20 +8,16 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.stereotype.Service;
 
-import com.HMS.HospitalManagementSystem.entities.Patient;
-
-import lombok.Value;
-
 @Service
 public class EncryptionService {
     private static final String AES_KEY = "YourKey16Secrets";
 
     //Encrypt prescriptions and patient details using AES-128
-    public String encryptAES128(String rawPrescriptionText) throws Exception{
+    public String encryptAES128(String data) throws Exception{
         SecretKeySpec secretKey = new SecretKeySpec(AES_KEY.getBytes(), "AES");
         Cipher cipher = Cipher.getInstance("AES"); // Cipher is used for encryption and decryption
         cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-        byte[] encryptedBytes = cipher.doFinal(rawPrescriptionText.getBytes());
+        byte[] encryptedBytes = cipher.doFinal(data.getBytes());
         return Base64.getEncoder().encodeToString(encryptedBytes);
     }
 
@@ -39,6 +35,17 @@ public class EncryptionService {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    // Decrypt the AES-128 encrypted prescriptions
+    public String decryptAES128(String encryptedData) throws Exception{
+        SecretKeySpec secretKey = new SecretKeySpec(AES_KEY.getBytes(), "AES");
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+
+        // Decode from Base64, then decrypt
+        byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedData));
+        return new String(decryptedBytes);
     }
    
     

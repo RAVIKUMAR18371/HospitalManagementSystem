@@ -1,6 +1,8 @@
-package com.HMS.HospitalManagementSystem.entities;
+package com.HMS.HospitalManagementSystem.controllers;
 
 import com.HMS.HospitalManagementSystem.HospitalManagementSystemApplication;
+import com.HMS.HospitalManagementSystem.entities.MedicalRecord;
+
 import java.util.UUID;
 
 import org.springframework.security.access.prepost.PreAuthorize;

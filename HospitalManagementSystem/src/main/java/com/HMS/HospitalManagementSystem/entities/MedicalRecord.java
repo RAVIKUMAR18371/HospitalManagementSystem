@@ -21,6 +21,8 @@ public class MedicalRecord {
     private String description; // e.g., "general-checkup"
 
     // Stores the AES-128 encrypted prescription
+    /*@Column: This annotation tells the database, "Hey, map this Java variable to a column in my table."
+    columnDefinition = "TEXT": This is the most important part. By default, a Java String maps to a VARCHAR(255). */
     @Column(columnDefinition = "TEXT")
     private String encryptedPrescription;
 
