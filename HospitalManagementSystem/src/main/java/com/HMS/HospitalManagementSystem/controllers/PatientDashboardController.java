@@ -38,27 +38,29 @@ public class PatientDashboardController {
     // Step 2: Verify the File Key and Decrypt the Document
     @PostMapping("/download")
     @PreAuthorize("hasRole('USER')")
-    public String downloadAndDecryptDocument(
-            @RequestParam Integer documentId, 
-            @RequestParam String enteredFileKey) throws Exception {
+    public String downloadAndDecryptDocument(@RequestParam Integer documentId, @RequestParam String enteredFileKey) throws Exception{
+        // Fetch the Specific Medical Record from the database
+        // Using 'recordRepository' to match your constructor injection
+        MedicalRecord record = recordRepository.findById(documentId)
+        .orElseThrow(() -> new RuntimeException("Medical Record not found."));
 
-        // 1. Fetch the specific Medical Record from the database
-        // MedicalRecord record = medicalRecordRepository.findById(documentId).orElseThrow();
 
-        // 2. Verify that the user entered the correct File Key
-        // String actualFileKey = record.getFileKey();
-        String actualFileKey = "5JecV"; // Hardcoded for demonstration
+        // 2. Retrieve the actual File Key securely stored in the database
+        String actualFileKey = record.getFileKey();
 
-        if (!actualFileKey.equals(enteredFileKey)) {
+        // 3. Verify that the user entered the correct File Key
+        if(!actualFileKey.equals(enteredFileKey)){
             return "Access Denied: Invalid Decrypt Secret Key.";
         }
 
-        // 3. If the key matches, decrypt the prescription using AES-128
-        // String encryptedData = record.getEncryptedPrescription();
-        String encryptedData = "base64EncryptedStringHere..."; // Placeholder
-        
-        // String decryptedPrescription = encryptionService.decryptAES128(encryptedData);
+        // 4. If the Key matches, retrieve the AES-128 encrypted prescription from the database
+        String encryptedData = record.getEncryptedPrescription();
 
-        return "Decryption successful! Here is your prescription data.";
+        // 5. I am Decrypting the Prescription back into readable text
+        String decryptedPrescription = encryptionService.decryptAES128(encryptedData);
+
+        // 6. Return the actual decrypted medical data to the patient
+        return "Decryption successful! Here is your prescription data:\n\n" + decryptedPrescription;
     }
+
 }

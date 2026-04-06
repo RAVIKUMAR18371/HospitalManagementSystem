@@ -14,6 +14,7 @@ public class Patient {
 
     private String name;
     private String email;
+    private String Address;
 
     private String password;
 
@@ -21,6 +22,16 @@ public class Patient {
 
     private String secretId; // It is needed for document verification and it is used for that.
 
+
+    private String status = "PENDING";
+
+    
+    public void setStatus(String status){
+        this.status = status;
+    }
+    public String getStatus(){
+        return status;
+    }
     public Integer getPatientId(){
         return patientId;
     }
@@ -62,6 +73,14 @@ public class Patient {
 
     public String getSecretId(){
         return secretId;
+    }
+
+    public void setAddress(String address){
+        this.Address = address;
+    }
+
+    public String getAddress(){
+        return Address;
     }
     
 }
