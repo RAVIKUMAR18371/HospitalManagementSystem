@@ -10,6 +10,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -19,19 +24,31 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            .csrf(csrf -> csrf.disable()) // disable CSRF for Postman
+            .cors(cors -> cors.configurationSource(corsConfigurationSource())) // ✅ CORS fix
+            .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-
-                // Not check Authentication-> Public APIs (NO AUTH REQUIRED)
                 .requestMatchers("/api/register/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
-
-                //  Protected APIs
                 .anyRequest().authenticated()
             )
-            .httpBasic(Customizer.withDefaults()); // simple auth (username + password)
+            .httpBasic(Customizer.withDefaults());
 
         return http.build();
+    }
+
+    // CORS Configuration — Browser se calls allow karega
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of("*"));           // All origins allow
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // All methods
+        config.setAllowedHeaders(List.of("*"));            // All headers allow (Authorization bhi)
+        config.setExposedHeaders(List.of("Authorization")); // Frontend ko header dikhaega
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);   // Sabhi routes pe apply hoga
+        return source;
     }
 
     @Bean
@@ -40,8 +57,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-    
 }
