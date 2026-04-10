@@ -1,14 +1,15 @@
 package com.HMS.HospitalManagementSystem.controllers;
 
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.HMS.HospitalManagementSystem.entities.Patient;
+import com.HMS.HospitalManagementSystem.entities.Role;
+import com.HMS.HospitalManagementSystem.entities.RoleEnum;
 import com.HMS.HospitalManagementSystem.entities.User;
 import com.HMS.HospitalManagementSystem.repositories.PatientRepository;
 import com.HMS.HospitalManagementSystem.repositories.RoleRepository;
@@ -25,6 +26,7 @@ public class RegistrationController {
   private final EncryptionService encryptionService;
   private final PasswordEncoder passwordEncoder;
 
+  @Autowired
   public RegistrationController(PatientRepository patientRepository, UserRepository userRepository,
                                 RoleRepository roleRepository, EncryptionService encryptionService,
                                 PasswordEncoder passwordEncoder){
@@ -56,9 +58,19 @@ public class RegistrationController {
         Role userRole = roleRepository.findByName(RoleEnum.USER)
                                         .orElseThrow(() -> new RuntimeException("Role not found"));
 
+      // 3. Saving the Role
         newUser.setRole(userRole);
 
-        return "Registration successful. Please wait for Admin Approvaql to log in";
+        // 4. Now saving the user first
+        userRepository.save(newUser);
+
+        // 5. I am linking now
+        patient.setUser(newUser);
+
+        //6. Save patient
+        patientRepository.save(patient);
+
+        return "Registration successful. Please wait for Admin Approval to log in";
         
      }
   

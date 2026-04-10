@@ -1,10 +1,11 @@
 package com.HMS.HospitalManagementSystem.security;
 
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import java.util.Optional;
+
+import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 
+import com.HMS.HospitalManagementSystem.entities.User;
 import com.HMS.HospitalManagementSystem.repositories.UserRepository;
 
 @Service
@@ -17,13 +18,14 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException{
-        return userRepository.findByEmail(email)
-                            .orElseThrow(() -> new UsernameNotFoundException("user not found with email: "+ email));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+
+        Optional<User> user = userRepository.findByEmail(email);
+
+        if(user.isEmpty()){
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return user.get(); // your User already implements UserDetails ✅
     }
-
-   
-
-
-    
 }

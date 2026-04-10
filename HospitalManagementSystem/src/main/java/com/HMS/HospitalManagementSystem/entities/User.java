@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -28,7 +29,7 @@ public class User implements UserDetails {
     // 1. Added Password Field
     private String password;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName="id", nullable=false)
     private Role role;
 
@@ -38,7 +39,7 @@ Because Spring Security is designed to handle users with many roles, it insists 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities(){
         // 2. Fixed Prefix: Spring Security absolutely requires "ROLE_" in all caps [1]
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("Role_" + role.getName().toString());
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.getName().toString());
         return List.of(authority);
     }
 
@@ -47,6 +48,18 @@ Because Spring Security is designed to handle users with many roles, it insists 
     @Override
     public String getPassword(){
         return this.password;
+    }
+
+    public void setPassword(String password){
+        this.password = password;
+    }
+
+    public void setRole(Role role){
+        this.role = role;
+    }
+
+    public Role getRole(){
+        return role;
     }
 
     // 4. Fixed GetUserName: We are using email to log in, so return the email here

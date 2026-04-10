@@ -21,9 +21,9 @@ public class AuthController {
 
     // This is where Postman will send the login request
     @PostMapping("/login")
-    public String login(@RequestParam String email, @RequestParam String Password){
+    public String login(@RequestParam String email, @RequestParam String password){
         // Spring Security verifies the Bcrypt hashed password against the database
-         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, Password));
+         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
 
         // If successful, save the user in the secure context
         SecurityContextHolder.getContext().setAuthentication(authentication); // this is basically used to mark that the user is authenticated user.
