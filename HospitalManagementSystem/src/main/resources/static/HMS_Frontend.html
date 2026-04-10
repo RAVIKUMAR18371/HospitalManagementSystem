@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediCore HMS</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+
+  <!-- NAVBAR -->
+  <nav>
+    <div class="logo">Medi<span>Core</span> HMS</div>
+    <div class="nav-right">
+      <div class="user-badge" id="userBadge">
+        <div class="role-dot"></div>
+        <span id="badgeText"></span>
+      </div>
+      <button class="btn-logout" id="logoutBtn" style="display:none" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <!-- ======== PAGE: HOME ======== -->
+  <div class="page active" id="page-home">
+    <div class="hero">
+      <div class="hero-tag">Hospital Management System</div>
+      <h1>Modern Healthcare,<br><em>Smarter</em> Management</h1>
+      <p>A secure platform for patients, doctors, and administrators to manage hospital records efficiently.</p>
+      <div class="hero-btns">
+        <button class="btn btn-primary" onclick="showPage('page-login')">🔐 Login</button>
+        <button class="btn btn-outline" onclick="showPage('page-register')">📝 Register as Patient</button>
+      </div>
+    </div>
+
+    <div class="role-grid">
+      <div class="role-card" onclick="showPage('page-login')">
+        <div class="role-icon">🧑‍💼</div>
+        <h3>Super Admin</h3>
+        <p>Manage admins, delete patients, full system control</p>
+      </div>
+      <div class="role-card" onclick="showPage('page-login')">
+        <div class="role-icon">👨‍⚕️</div>
+        <h3>Admin</h3>
+        <p>Update patient records, create doctors and admins</p>
+      </div>
+      <div class="role-card" onclick="showPage('page-login')">
+        <div class="role-icon">🩺</div>
+        <h3>Doctor</h3>
+        <p>Submit encrypted patient medical reports</p>
+      </div>
+      <div class="role-card" onclick="showPage('page-register')">
+        <div class="role-icon">🏥</div>
+        <h3>Patient</h3>
+        <p>Register and view your approved medical records</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE: LOGIN ======== -->
+  <div class="page" id="page-login">
+    <div class="card">
+      <h2>Welcome Back</h2>
+      <p class="subtitle">Login with your email and password</p>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="admin@gmail.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••">
+      </div>
+
+      <button class="btn btn-primary btn-full mt-16" id="loginBtn" onclick="doLogin()">Login</button>
+      <div class="alert" id="loginAlert"></div>
+
+      <div class="divider">Quick Fill</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-outline" style="font-size:0.78rem; padding:6px 12px;" onclick="quickFill('superadmin@gmail.com','super123')">SuperAdmin</button>
+        <button class="btn btn-outline" style="font-size:0.78rem; padding:6px 12px;" onclick="quickFill('admin@gmail.com','admin123')">Admin</button>
+        <button class="btn btn-outline" style="font-size:0.78rem; padding:6px 12px;" onclick="quickFill('doctor@gmail.com','doctor123')">Doctor</button>
+      </div>
+
+      <div class="divider">or</div>
+      <div class="text-center">
+        <span style="color:var(--text2); font-size:0.87rem;">New patient? </span>
+        <a class="link" onclick="showPage('page-register')">Register here</a>
+      </div>
+      <div class="mt-16 text-center">
+        <a class="link" onclick="showPage('page-home')">← Back to Home</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE: REGISTER ======== -->
+  <div class="page" id="page-register">
+    <div class="card">
+      <h2>Patient Registration</h2>
+      <p class="subtitle">Fill in your details — Admin approval required after registration</p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="Ravi Kumar">
+        </div>
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" id="regAge" placeholder="22">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="regEmail" placeholder="ravi@gmail.com">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="regPassword" placeholder="••••••••">
+      </div>
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" id="regAddress" placeholder="Delhi, India">
+      </div>
+      <div class="form-group">
+        <label>Secret ID <span style="color:var(--text2); font-size:0.78rem">(for document verification)</span></label>
+        <input type="text" id="regSecretId" placeholder="ABCD1234">
+      </div>
+
+      <button class="btn btn-primary btn-full mt-16" id="registerBtn" onclick="doRegister()">Register</button>
+      <div class="alert" id="registerAlert"></div>
+
+      <div class="divider">or</div>
+      <div class="text-center">
+        <span style="color:var(--text2); font-size:0.87rem;">Already have account? </span>
+        <a class="link" onclick="showPage('page-login')">Login here</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE: PATIENT DASHBOARD ======== -->
+  <div class="page" id="page-patient">
+    <div class="page-header">
+      <h1>Patient Dashboard</h1>
+      <p>View your approved medical records and prescriptions</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('tab-records','tab-decrypt',this)">📋 My Records</button>
+      <button class="tab" onclick="switchTab('tab-decrypt','tab-records',this)">🔓 Decrypt Prescription</button>
+    </div>
+
+    <div class="tab-content active" id="tab-records">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label style="display:inline; margin:0;">Patient ID:</label>
+          <input type="number" id="patientIdInput" placeholder="1" style="width:80px; display:inline-block;">
+        </div>
+        <button class="btn btn-primary" onclick="loadRecords()">Load Records</button>
+      </div>
+      <div class="table-wrap" id="recordsTable">
+        <div class="empty">
+          <div class="empty-icon">📋</div>
+          <p>Enter your Patient ID and click Load Records</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-decrypt">
+      <div class="card card-wide">
+        <h2>Decrypt Prescription</h2>
+        <p class="subtitle">Enter document ID and the file key given by your doctor</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Document ID</label>
+            <input type="number" id="decryptDocId" placeholder="1">
+          </div>
+          <div class="form-group">
+            <label>File Key</label>
+            <input type="text" id="decryptKey" placeholder="abc12345">
+          </div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="doDecrypt()">🔓 Decrypt</button>
+        <div class="alert" id="decryptAlert"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE: ADMIN DASHBOARD ======== -->
+  <div class="page" id="page-admin">
+    <div class="page-header">
+      <h1>Admin Dashboard</h1>
+      <p>Manage patients, create staff accounts</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('tab-update','tab-create-staff',this)">✏️ Update Patient</button>
+      <button class="tab" onclick="switchTab('tab-create-staff','tab-update',this)">➕ Create Staff</button>
+    </div>
+
+    <div class="tab-content active" id="tab-update">
+      <div class="card card-wide">
+        <h2>Update Patient Record</h2>
+        <p class="subtitle">Update patient details (Admin only)</p>
+        <div class="form-group">
+          <label>Patient ID</label>
+          <input type="number" id="updatePatientId" placeholder="1">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>New Age</label>
+            <input type="number" id="updateAge" placeholder="25">
+          </div>
+          <div class="form-group">
+            <label>New Address</label>
+            <input type="text" id="updateAddress" placeholder="Mumbai, India">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>New Secret ID <span style="color:var(--text2); font-size:0.78rem">(optional)</span></label>
+          <input type="text" id="updateSecretId" placeholder="Leave empty to keep same">
+        </div>
+        <button class="btn btn-primary btn-full mt-16" onclick="doUpdatePatient()">Update Patient</button>
+        <div class="alert" id="updateAlert"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-create-staff">
+      <div class="card card-wide">
+        <h2>Create Staff Account</h2>
+        <p class="subtitle">Admin can create Doctors | SuperAdmin can create Admins</p>
+        <div class="form-group">
+          <label for="staffType">Account Type</label>
+          <select id="staffType" title="Select account type">
+            <option value="doctor">Doctor (Admin or SuperAdmin)</option>
+            <option value="admin">Admin (SuperAdmin only)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="staffEmail" placeholder="newdoctor@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="staffPassword" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary btn-full mt-16" onclick="doCreateStaff()">Create Account</button>
+        <div class="alert" id="staffAlert"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE: DOCTOR DASHBOARD ======== -->
+  <div class="page" id="page-doctor">
+    <div class="page-header">
+      <h1>Doctor Dashboard</h1>
+      <p>Submit encrypted medical reports for patients</p>
+    </div>
+
+    <div class="card card-wide">
+      <h2>Submit Patient Report</h2>
+      <p class="subtitle">Report will be encrypted with AES-128 before saving</p>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Patient ID</label>
+          <input type="number" id="docPatientId" placeholder="1">
+        </div>
+        <div class="form-group">
+          <label>Doctor ID</label>
+          <input type="number" id="docDoctorId" placeholder="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" id="docDept" placeholder="Cardiology">
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" id="docDesc" placeholder="Heart checkup">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Prescription / Report</label>
+        <textarea id="docPrescription" placeholder="Patient has mild fever. Take Paracetamol 500mg twice daily..."></textarea>
+      </div>
+      <button class="btn btn-primary btn-full" onclick="doSubmitReport()">🔒 Submit Encrypted Report</button>
+      <div class="alert" id="reportAlert"></div>
+
+      <div class="filekey-box" id="fileKeyBox">
+        <div class="key-label">🔑 Generated File Key — Share this with Patient!</div>
+        <div class="key-value" id="fileKeyValue"></div>
+        <div style="font-size:0.78rem; color:var(--text2); margin-top:8px;">Patient needs this key to decrypt their prescription</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== PAGE: SUPERADMIN DASHBOARD ======== -->
+  <div class="page" id="page-superadmin">
+    <div class="page-header">
+      <h1>Super Admin Dashboard</h1>
+      <p>Full system control — delete patients, create admins</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('tab-delete','tab-sa-create',this)">🗑️ Delete Patient</button>
+      <button class="tab" onclick="switchTab('tab-sa-create','tab-delete',this)">➕ Create Admin</button>
+    </div>
+
+    <div class="tab-content active" id="tab-delete">
+      <div class="card card-wide">
+        <h2>Delete Patient</h2>
+        <p class="subtitle">Permanently removes patient from the system</p>
+        <div class="form-group">
+          <label>Patient ID</label>
+          <input type="number" id="deletePatientId" placeholder="1">
+        </div>
+        <button class="btn btn-danger btn-full mt-16" onclick="doDeletePatient()">🗑️ Delete Patient</button>
+        <div class="alert" id="deleteAlert"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-sa-create">
+      <div class="card card-wide">
+        <h2>Create New Admin</h2>
+        <p class="subtitle">Only SuperAdmin can create admin accounts</p>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="saAdminEmail" placeholder="newadmin@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="saAdminPassword" placeholder="••••••••">
+        </div>
+        <button class="btn btn-primary btn-full mt-16" onclick="doCreateAdmin()">Create Admin</button>
+        <div class="alert" id="saAlert"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .app -->
+
+<script src="app.js"></script>
+</body>
+</html>
