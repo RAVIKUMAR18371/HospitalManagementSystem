@@ -40,39 +40,33 @@ public class RegistrationController {
      }
 
      @PostMapping("/patient")
-     public String registerPatient(@RequestBody Patient patient) throws Exception{
-        // 1. Encrypt medical secret ID using AES-128
-        patient.setSecretId(encryptionService.encryptAES128(patient.getSecretId()));
-        patient.setStatus("PENDING");
-        patientRepository.save(patient);
+public String registerPatient(@RequestBody Patient patient) throws Exception {
 
-        // 2. Create the Spring Security User for Login
-        User newUser = new User();
-        newUser.setEmail(patient.getEmail());
+    // CHECK 1 — Duplicate email check
+    if(userRepository.findByEmail(patient.getEmail()).isPresent()) {
+        return "Error: Email already registered!";
+    }
 
-        // Hash the Password using Bcrypt!
-        newUser.setPassword(passwordEncoder.encode(patient.getPassword()));
+    // CHECK 2 — Encrypt secretId
+    patient.setSecretId(encryptionService.encryptAES128(patient.getSecretId()));
+    patient.setStatus("PENDING");
 
+    // CHECK 3 — Pehle User banao
+    User newUser = new User();
+    newUser.setEmail(patient.getEmail());
+    newUser.setPassword(passwordEncoder.encode(patient.getPassword()));
 
-        // 3. Assign the USER role
-        Role userRole = roleRepository.findByName(RoleEnum.USER)
-                                        .orElseThrow(() -> new RuntimeException("Role not found"));
+    Role userRole = roleRepository.findByName(RoleEnum.USER)
+                    .orElseThrow(() -> new RuntimeException("Role not found"));
+    newUser.setRole(userRole);
+    userRepository.save(newUser); // ← Pehle user save
 
-      // 3. Saving the Role
-        newUser.setRole(userRole);
+    //CHECK 4 — Phir Patient banao with user link
+    patient.setUser(newUser);
+    patientRepository.save(patient); // ← Phir patient save
 
-        // 4. Now saving the user first
-        userRepository.save(newUser);
-
-        // 5. I am linking now
-        patient.setUser(newUser);
-
-        //6. Save patient
-        patientRepository.save(patient);
-
-        return "Registration successful. Please wait for Admin Approval to log in";
-        
-     }
+    return "Registration successful. Please wait for Admin Approval to log in";
+}
   
 
     

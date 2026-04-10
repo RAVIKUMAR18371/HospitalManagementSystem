@@ -13,14 +13,17 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.HMS.HospitalManagementSystem.security.EncryptionService;
+import com.HMS.HospitalManagementSystem.repositories.MedicalRecordRepository;
 
 @RestController
 @RequestMapping("/api/doctors")
 public class DoctorController {
     private final EncryptionService encryptionService;
+    private final MedicalRecordRepository medicalRecordRepository;
     
-    public DoctorController(EncryptionService encryptionService) {
+    public DoctorController(EncryptionService encryptionService, MedicalRecordRepository medicalRecordRepository) {
         this.encryptionService = encryptionService;
+        this.medicalRecordRepository = medicalRecordRepository;
     }
     
     // Accessible Only by an approved DOCTOR
@@ -51,10 +54,10 @@ public class DoctorController {
             String generatedFileKey = UUID.randomUUID().toString().substring(0,8);// Generate a random 8-character key for decrytion.
             record.setFileKey(generatedFileKey);
 
-            // medicalRecordRepository.save(record);
+             medicalRecordRepository.save(record);
 
             // In a real application i would return the record details for confirmation and also share the fileKey securely with the patient and doctor for later use in decryption of the prescription.hospitalManagementSystemApplication
-            return "Success, I have successfully sent the patient details.";
+            return "Success, I have successfully sent the patient details and generated file key is " + generatedFileKey;
         }
     
 }
