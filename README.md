@@ -83,7 +83,7 @@ POST /api/doctors/submit-report           → Submit encrypted patient report
 
 **1. Clone the repo**
 ```bash
-git clone https://github.com/yourusername/HospitalManagementSystem.git
+git clone https://github.com/RAVIKUMAR18371/HospitalManagementSystem.git
 cd HospitalManagementSystem
 ```
 
