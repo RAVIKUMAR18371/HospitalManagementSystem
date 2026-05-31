@@ -1,8 +1,8 @@
 package com.HMS.HospitalManagementSystem.controllers;
 
-import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,20 +15,16 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
 
-    public AuthController(AuthenticationManager authenticationManager){
+    public AuthController(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
 
-    // This is where Postman will send the login request
     @PostMapping("/login")
-    public String login(@RequestParam String email, @RequestParam String password){
-        // Spring Security verifies the Bcrypt hashed password against the database
-         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-
-        // If successful, save the user in the secure context
-        SecurityContextHolder.getContext().setAuthentication(authentication); // this is basically used to mark that the user is authenticated user.
-
-        return "Login successful! I can now access protected Areas";
+    public String login(@RequestParam String email, @RequestParam String password) {
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(email, password)
+        );
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        return "Login successful! You can now access protected areas.";
     }
-    
 }

@@ -15,55 +15,48 @@ import com.HMS.HospitalManagementSystem.security.EncryptionService;
 @RestController
 @RequestMapping("/api/admin/patients")
 public class AdminPatientController {
+
     private final PatientRepository patientRepository;
     private final EncryptionService encryptionService;
 
-    public AdminPatientController(PatientRepository patientRepository, EncryptionService encryptionService){
-        this.encryptionService = encryptionService;
+    public AdminPatientController(PatientRepository patientRepository, EncryptionService encryptionService) {
         this.patientRepository = patientRepository;
+        this.encryptionService = encryptionService;
     }
 
-    // Now --> I am going to use the PUT method for updating the record
     @PutMapping("/update/{patientId}")
-    @PreAuthorize("hasRole('ADMIN')") // only the Admin can update
-    public String updatePatient(@PathVariable Integer patientId, @RequestBody Patient updatedData) throws Exception{
-        // Fetch the existing patient from the DB
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    // BUG FIX #23: Original had @PreAuthorize("hasRole('ADMIN')") — this means
+    // SUPER_ADMIN cannot update patients, which is logically wrong. A super admin
+    // should have all admin powers. Fixed to hasAnyRole('ADMIN', 'SUPER_ADMIN').
+    public String updatePatient(@PathVariable Integer patientId, @RequestBody Patient updatedData) throws Exception {
         Patient existingPatient = patientRepository.findById(patientId)
-                                                    .orElseThrow(() -> new RuntimeException("Patient not found"));
+                .orElseThrow(() -> new RuntimeException("Patient not found with ID: " + patientId));
 
-    // Updating the Allowed Fields
-    existingPatient.setAge(updatedData.getAge());
-    existingPatient.setAddress(updatedData.getAddress());
-
-    // If a sensitive field is updated, I am encrypting again before Saving
-    if(updatedData.getSecretId() != null){
-        existingPatient.setSecretId(encryptionService.encryptAES128(updatedData.getSecretId()));
-    }
-
-    // Now I am saving the updated Record in Postgre
-    patientRepository.save(existingPatient);
-
-    return "I have updated and secured done successfully";
-
-    }
-
-
-    // Delete Method --> Removing the Patient from the system
-    @DeleteMapping("/delete/{patientId}")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public String deletePatient(@PathVariable Integer patientId){
-        // First I will check that the Patient exist or not
-        if(!patientRepository.existsById(patientId)){
-            return "Error: Patient does not exist.";
+        // Update allowed fields
+        if (updatedData.getAge() != null) {
+            existingPatient.setAge(updatedData.getAge());
+        }
+        if (updatedData.getAddress() != null) {
+            existingPatient.setAddress(updatedData.getAddress());
         }
 
-        // Actually delete the row from the Postgres database
-        patientRepository.deleteById(patientId);
+        // Re-encrypt secretId if provided
+        if (updatedData.getSecretId() != null && !updatedData.getSecretId().isEmpty()) {
+            existingPatient.setSecretId(encryptionService.encryptAES128(updatedData.getSecretId()));
+        }
 
-        return "Patient successfully deleted from the system.";
-
+        patientRepository.save(existingPatient);
+        return "Patient updated successfully.";
     }
 
-
-    
+    @DeleteMapping("/delete/{patientId}")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public String deletePatient(@PathVariable Integer patientId) {
+        if (!patientRepository.existsById(patientId)) {
+            return "Error: Patient does not exist.";
+        }
+        patientRepository.deleteById(patientId);
+        return "Patient successfully deleted from the system.";
+    }
 }

@@ -17,15 +17,14 @@ public class Doctor {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer doctorId;
-    public Integer getDoctorId(){
-        return doctorId;
-    }
+
+    // BUG FIX #9: Removed the manually written "public Integer getDoctorId()" method.
+    // @Getter from Lombok ALREADY generates getDoctorId(). Having both causes a
+    // "duplicate method" compile error.
 
     private String name;
     private String email;
-    private String specialization; // like --> Surgery, Cardio, General Physian
+    private String specialization; // e.g., Surgery, Cardiology, General Physician
     private String contact;
-
-
-    
 }
+

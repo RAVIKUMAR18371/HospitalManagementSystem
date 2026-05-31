@@ -17,7 +17,8 @@ public class SuperAdminSeeder implements ApplicationListener<ContextRefreshedEve
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public SuperAdminSeeder(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    public SuperAdminSeeder(UserRepository userRepository, RoleRepository roleRepository,
+                            PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -31,10 +32,10 @@ public class SuperAdminSeeder implements ApplicationListener<ContextRefreshedEve
             superAdmin.setPassword(passwordEncoder.encode("super123"));
 
             Role superAdminRole = roleRepository.findByName(RoleEnum.SUPER_ADMIN)
-                    .orElseThrow(() -> new RuntimeException("SUPER_ADMIN Role not found"));
+                    .orElseThrow(() -> new RuntimeException("SUPER_ADMIN Role not found — ensure RoleSeeder runs first"));
             superAdmin.setRole(superAdminRole);
             userRepository.save(superAdmin);
-            System.out.println("✅ SuperAdmin created: superadmin@gmail.com / super123");
+            System.out.println("SuperAdmin created: superadmin@gmail.com / super123");
         }
     }
 }

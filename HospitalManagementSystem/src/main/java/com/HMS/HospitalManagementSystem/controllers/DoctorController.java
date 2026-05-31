@@ -1,7 +1,8 @@
 package com.HMS.HospitalManagementSystem.controllers;
 
-import com.HMS.HospitalManagementSystem.HospitalManagementSystemApplication;
 import com.HMS.HospitalManagementSystem.entities.MedicalRecord;
+import com.HMS.HospitalManagementSystem.repositories.MedicalRecordRepository;
+import com.HMS.HospitalManagementSystem.security.EncryptionService;
 
 import java.util.UUID;
 
@@ -12,53 +13,56 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.HMS.HospitalManagementSystem.security.EncryptionService;
-import com.HMS.HospitalManagementSystem.repositories.MedicalRecordRepository;
+// BUG FIX #24: Removed the erroneous import of HospitalManagementSystemApplication.
+// That import was completely wrong — a @SpringBootApplication class should never
+// be imported inside a controller. It caused a compile warning and could confuse
+// the Spring context if misused.
 
 @RestController
 @RequestMapping("/api/doctors")
 public class DoctorController {
+
     private final EncryptionService encryptionService;
     private final MedicalRecordRepository medicalRecordRepository;
-    
+
     public DoctorController(EncryptionService encryptionService, MedicalRecordRepository medicalRecordRepository) {
         this.encryptionService = encryptionService;
         this.medicalRecordRepository = medicalRecordRepository;
     }
-    
-    // Accessible Only by an approved DOCTOR
+
     @PostMapping("/submit-report")
     @PreAuthorize("hasRole('DOCTOR')")
     public String submitPatientReport(
-        @RequestParam Integer patientId,
-        @RequestParam Integer doctorId,
-        @RequestParam String department,
-        @RequestParam String description,
-        @RequestBody String rawPrescriptionText) throws Exception{
-            MedicalRecord record = new MedicalRecord();
-            record.setPatientId(patientId);
-            record.setDoctorId(doctorId);
-            record.setDepartment(department);
-            record.setDescription(description);
+            @RequestParam Integer patientId,
+            @RequestParam Integer doctorId,
+            @RequestParam String department,
+            @RequestParam String description,
+            @RequestBody String rawPrescriptionText) throws Exception {
 
-            //1. Encrypt the prescription using AES-128 before saving
-            String encryptedData = encryptionService.encryptAES128(rawPrescriptionText);
-            record.setEncryptedDescription(encryptedData);
+        MedicalRecord record = new MedicalRecord();
+        record.setPatientId(patientId);
+        record.setDoctorId(doctorId);
+        record.setDepartment(department);
+        record.setDescription(description);
 
-            //2.  Generate SHA-256 hash to verify data integrity against unauthorized modifications
-            String hash = encryptionService.generateSHA256Hash(encryptedData);
-            record.setDataHash(hash);
+        // 1. Encrypt the prescription using AES-128 before saving
+        String encryptedData = encryptionService.encryptAES128(rawPrescriptionText);
 
-            // 3. Generate a unique File Key (Decryption Key)
-            // This Key is created during approval/submission and kepy safe in the database and only shared with the patient and doctor for later decryption of the prescription.
-            String generatedFileKey = UUID.randomUUID().toString().substring(0,8);// Generate a random 8-character key for decrytion.
-            record.setFileKey(generatedFileKey);
+        // BUG FIX #25: Original called record.setEncryptedDescription(encryptedData)
+        // but after the MedicalRecord fix, the setter is now correctly named
+        // setEncryptedPrescription. Updated to match.
+        record.setEncryptedPrescription(encryptedData);
 
-             medicalRecordRepository.save(record);
+        // 2. Generate SHA-256 hash for data integrity verification
+        String hash = encryptionService.generateSHA256Hash(encryptedData);
+        record.setDataHash(hash);
 
-            // In a real application i would return the record details for confirmation and also share the fileKey securely with the patient and doctor for later use in decryption of the prescription.hospitalManagementSystemApplication
-            return "Success, I have successfully sent the patient details and generated file key is " + generatedFileKey;
-        }
-    
+        // 3. Generate a unique 8-character File Key for later decryption
+        String generatedFileKey = UUID.randomUUID().toString().substring(0, 8);
+        record.setFileKey(generatedFileKey);
+
+        medicalRecordRepository.save(record);
+
+        return "Report submitted successfully. Generated File Key for patient: " + generatedFileKey;
+    }
 }
-
